@@ -13,6 +13,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final ApiService _apiService = ApiService(); // Instancie o serviço de API
 
+  bool _obscureText = true; // Controla se a senha está oculta
+
   void _login() async {
     // Validação dos campos de email e senha
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -128,17 +130,28 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 60,
                       child: TextField(
                         controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                            suffix: Icon(
-                              FontAwesomeIcons.eyeSlash,
+                        obscureText:
+                            _obscureText, // Use a variável para controlar a visibilidade
+                        decoration: InputDecoration(
+                          suffix: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _obscureText =
+                                    !_obscureText; // Alterna entre mostrar e esconder a senha
+                              });
+                            },
+                            child: Icon(
+                              _obscureText
+                                  ? FontAwesomeIcons.eyeSlash
+                                  : FontAwesomeIcons.eye,
                               color: Colors.red,
                             ),
-                            labelText: "Senha",
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                            )),
+                          ),
+                          labelText: "Senha",
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(

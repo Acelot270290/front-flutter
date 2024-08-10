@@ -1,7 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../services/api_service.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _obscureText = true;
+
+  final ApiService apiService = ApiService(); // Instância do ApiService
+
+  void _register() {
+    final username = _usernameController.text;
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Todos os campos são obrigatórios')),
+      );
+      return;
+    }
+
+    apiService.register(username, email, password, context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,8 +58,6 @@ class RegisterScreen extends StatelessWidget {
               const SizedBox(
                 height: 150,
                 width: 300,
-                // Placeholder for animation
-                //child: LottieBuilder.asset("assets/lottie/register.json"),
               ),
               const SizedBox(
                 height: 10,
@@ -66,22 +93,20 @@ class RegisterScreen extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    const SizedBox(
-                      height: 12,
-                    ),
                     Container(
                       width: 260,
-                      child: const TextField(
-                        decoration: InputDecoration(
-                            suffix: Icon(
-                              FontAwesomeIcons.envelope,
-                              color: Colors.red,
-                            ),
-                            labelText: "Endereço de Email",
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                            )),
+                      child: TextField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          suffix: Icon(
+                            FontAwesomeIcons.user,
+                            color: Colors.red,
+                          ),
+                          labelText: "Nome de usuário",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -89,24 +114,54 @@ class RegisterScreen extends StatelessWidget {
                     ),
                     Container(
                       width: 260,
-                      child: const TextField(
-                        obscureText: true,
+                      child: TextField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          suffix: Icon(
+                            FontAwesomeIcons.envelope,
+                            color: Colors.red,
+                          ),
+                          labelText: "Endereço de Email",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Container(
+                      width: 260,
+                      child: TextField(
+                        controller: _passwordController,
+                        obscureText: _obscureText,
                         decoration: InputDecoration(
-                            suffix: Icon(
-                              FontAwesomeIcons.eyeSlash,
+                          suffix: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                            child: Icon(
+                              _obscureText
+                                  ? FontAwesomeIcons.eyeSlash
+                                  : FontAwesomeIcons.eye,
                               color: Colors.red,
                             ),
-                            labelText: "Senha",
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                            )),
+                          ),
+                          labelText: "Senha",
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(
                       height: 20,
                     ),
                     GestureDetector(
+                      onTap: _register,
                       child: Container(
                         alignment: Alignment.center,
                         width: 250,
